@@ -3,6 +3,8 @@
 A small Flask app that answers NUST admissions questions **without calling the internet**. Everything runs on your machine: the UI, the FAQ data, and a lightweight search layer (BM25) over the text you ship in the repo.
 
 If you’re prepping for the local chatbot competition—or you just want a fast, boringly honest FAQ lookup—this is basically that.
+<img width="1020" height="894" alt="image" src="https://github.com/user-attachments/assets/9e518b8f-f9c6-4fcd-918a-b69b72beb97e" />
+
 
 ## What you get
 
