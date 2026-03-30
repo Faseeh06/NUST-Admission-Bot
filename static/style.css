@@ -1,0 +1,310 @@
+/* Black & white only. Light text on dark ground. No bold.
+   Single viewport: no page scroll; only .chat scrolls. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  height: 100dvh;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: system-ui, "Segoe UI", sans-serif;
+  font-weight: 400;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  color: #c4c4c4;
+  background: #0a0a0a;
+}
+
+h1,
+h2,
+h3,
+strong,
+b,
+button {
+  font-weight: 400;
+}
+
+/* One screen: header + panel + footer, no document scroll */
+.shell {
+  width: min(100%, 92vw);
+  max-width: 56rem;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0.75rem 0.75rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.head {
+  flex-shrink: 0;
+  margin-bottom: 0.5rem;
+}
+
+.head-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.head-text {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.btn-clear {
+  flex-shrink: 0;
+  font-family: inherit;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid #444;
+  background: #141414;
+  color: #9a9a9a;
+  cursor: pointer;
+  border-radius: 0;
+  align-self: flex-start;
+}
+
+.btn-clear:hover {
+  border-color: #666;
+  color: #c4c4c4;
+}
+
+.line {
+  margin: 0 0 0.2rem;
+}
+
+.title {
+  color: #e6e6e6;
+  letter-spacing: -0.02em;
+  font-size: 1.05rem;
+  margin-bottom: 0.15rem;
+}
+
+.dim {
+  color: #8a8a8a;
+  font-size: 0.8125rem;
+  line-height: 1.4;
+}
+
+/* Fills space between header and footer; only inner .chat scrolls */
+.panel {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border: 1px solid #2a2a2a;
+  background: #111;
+  overflow: hidden;
+}
+
+.chat {
+  flex: 1 1 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.msg {
+  max-width: 100%;
+  padding: 0.55rem 0;
+  border-bottom: 1px solid #1f1f1f;
+  font-size: 0.9375rem;
+}
+
+.msg:last-of-type {
+  border-bottom: none;
+}
+
+.msg.user {
+  color: #b0b0b0;
+  padding-left: 0.5rem;
+  border-left: 1px solid #3a3a3a;
+}
+
+.msg.bot {
+  color: #c8c8c8;
+}
+
+.msg.bot .meta {
+  font-size: 0.8125rem;
+  color: #7a7a7a;
+  margin-bottom: 0.5rem;
+}
+
+.msg.bot .body {
+  color: #c8c8c8;
+}
+
+.msg.bot .body strong,
+.msg.bot .body b {
+  font-weight: 400;
+  color: #c8c8c8;
+}
+
+.msg.bot .body a {
+  color: #a8a8a8;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.msg.bot .body p {
+  margin: 0 0 0.65rem;
+}
+
+.msg.bot .body p:last-child {
+  margin-bottom: 0;
+}
+
+.msg.bot .notice {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid #252525;
+  font-size: 0.875rem;
+  color: #909090;
+}
+
+.msg.bot .sources {
+  margin-top: 0.65rem;
+  font-size: 0.8125rem;
+  color: #7a7a7a;
+}
+
+.msg.bot .sources summary {
+  cursor: pointer;
+  color: #7a7a7a;
+}
+
+.msg.bot .sources ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1rem;
+}
+
+.composer {
+  flex-shrink: 0;
+  border-top: 1px solid #2a2a2a;
+  padding: 0.65rem 0.75rem 0.75rem;
+  background: #0a0a0a;
+}
+
+.composer textarea {
+  width: 100%;
+  resize: none;
+  min-height: 2.75rem;
+  max-height: 5rem;
+  padding: 0.5rem 0.65rem;
+  font: inherit;
+  font-weight: 400;
+  color: #d0d0d0;
+  background: #0a0a0a;
+  border: 1px solid #333;
+  border-radius: 0;
+}
+
+.composer textarea::placeholder {
+  color: #555;
+}
+
+.composer textarea:focus {
+  outline: 1px solid #555;
+  outline-offset: 0;
+}
+
+.composer-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  margin-top: 0.5rem;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.chip {
+  font-size: 0.75rem;
+  font-weight: 400;
+  padding: 0.25rem 0.45rem;
+  border: 1px solid #333;
+  background: transparent;
+  color: #8a8a8a;
+  cursor: pointer;
+  font-family: inherit;
+  border-radius: 0;
+}
+
+.chip:hover {
+  color: #b8b8b8;
+  border-color: #555;
+}
+
+.composer button[type="submit"] {
+  font-family: inherit;
+  font-weight: 400;
+  padding: 0.35rem 0.85rem;
+  border-radius: 0;
+  border: 1px solid #666;
+  cursor: pointer;
+  background: #1a1a1a;
+  color: #c4c4c4;
+}
+
+.composer button[type="submit"]:hover {
+  border-color: #888;
+  color: #e0e0e0;
+}
+
+.composer button[type="submit"]:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.foot {
+  flex-shrink: 0;
+  margin-top: 0.45rem;
+  padding-top: 0.25rem;
+}
+
+.foot .line {
+  margin: 0;
+}
+
+.foot code {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85em;
+  color: #888;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
