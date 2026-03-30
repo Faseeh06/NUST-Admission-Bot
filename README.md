@@ -33,9 +33,9 @@ First-time setup needs network for `pip`; after that, the app itself doesn’t n
 | `app.py` | Flask server and `/api/chat` |
 | `templates/`, `static/` | Chat UI |
 | `nust_chatbot/retrieve.py` | BM25 over FAQ entries |
-| `faq.md` | Raw FAQ HTML |
+| `faq.md` | FAQ as Markdown (`##` question, then answer) |
 | `data/faq.json` | Parsed Q&A (generated—don’t hand-edit unless you know what you’re doing) |
-| `scripts/extract_faq.py` | HTML → JSON |
+| `scripts/extract_faq.py` | `faq.md` → `data/faq.json` |
 | `scripts/benchmark.py` | Quick latency sanity check |
 
 ## Why BM25 and not a local LLM?

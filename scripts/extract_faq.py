@@ -1,57 +1,69 @@
-"""Parse faq.md (NUST admissions FAQ HTML) into structured JSON for offline retrieval."""
+"""Parse faq.md (Markdown Q&A) into data/faq.json for offline retrieval."""
 from __future__ import annotations
 
+import html
 import json
 import re
 import sys
 from pathlib import Path
 
-from bs4 import BeautifulSoup
-
 
 def _clean_text(s: str) -> str:
-    s = re.sub(r"\s+", " ", s).strip()
-    return s
+    s = re.sub(r"[ \t]+", " ", s)
+    s = re.sub(r"\n{3,}", "\n\n", s)
+    return s.strip()
 
 
-def extract_faq(html_path: Path) -> list[dict]:
-    raw = html_path.read_text(encoding="utf-8")
-    soup = BeautifulSoup(raw, "html.parser")
-    cards = soup.find_all("div", class_="card")
+def _answer_to_html(answer: str) -> str:
+    """Plain answer → simple <p> HTML for the UI."""
+    paras = [p.strip() for p in answer.split("\n\n") if p.strip()]
+    if not paras:
+        return ""
+    return "".join(f"<p>{html.escape(p)}</p>" for p in paras)
+
+
+def extract_faq_markdown(text: str) -> list[dict]:
+    text = text.lstrip("\ufeff").strip()
+    if text.startswith("#"):
+        first_nl = text.find("\n")
+        if first_nl != -1:
+            text = text[first_nl + 1 :].lstrip()
+    blocks = re.split(r"(?m)^##\s+", text)
+    blocks = [b.strip() for b in blocks if b.strip()]
     out: list[dict] = []
-    for i, card in enumerate(cards):
-        btn = card.find("button")
-        body = card.find("div", class_="card-body")
-        if not btn or not body:
+    for i, block in enumerate(blocks):
+        nl = block.find("\n")
+        if nl == -1:
             continue
-        spans = btn.find_all("span", recursive=False)
-        if not spans:
-            continue
-        q = _clean_text(spans[0].get_text(" ", strip=True))
-        a_html = body.decode_contents()
-        a = _clean_text(body.get_text(" ", strip=True))
+        q = _clean_text(block[:nl])
+        a = _clean_text(block[nl + 1 :])
         if not q or not a:
             continue
         out.append(
             {
-                "id": i,
+                "id": len(out),
                 "question": q,
                 "answer": a,
-                "answer_html": a_html.strip(),
+                "answer_html": _answer_to_html(a),
             }
         )
     return out
 
 
+def extract_faq(path: Path) -> list[dict]:
+    raw = path.read_text(encoding="utf-8")
+    return extract_faq_markdown(raw)
+
+
 def main() -> None:
     root = Path(__file__).resolve().parents[1]
-    html_path = root / "faq.md"
+    md_path = root / "faq.md"
     out_path = root / "data" / "faq.json"
-    if not html_path.is_file():
-        print(f"Missing {html_path}", file=sys.stderr)
+    if not md_path.is_file():
+        print(f"Missing {md_path}", file=sys.stderr)
         sys.exit(1)
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    faq = extract_faq(html_path)
+    faq = extract_faq(md_path)
     out_path.write_text(json.dumps(faq, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"Wrote {len(faq)} Q&A pairs to {out_path}")
 
