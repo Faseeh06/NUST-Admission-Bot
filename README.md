@@ -1,36 +1,55 @@
-# NUST Admissions Assistant (offline)
+# NUST Admissions Assistant
 
-Local-first FAQ assistant for the NUST Islamabad chatbot competition brief: **no internet**, **no remote APIs**, **CPU-only** (BM25 retrieval over a bundled FAQ snapshot).
+A small Flask app that answers NUST admissions questions **without calling the internet**. Everything runs on your machine: the UI, the FAQ data, and a lightweight search layer (BM25) over the text you ship in the repo.
 
-## What it does
+If you’re prepping for the local chatbot competition—or you just want a fast, boringly honest FAQ lookup—this is basically that.
 
-- Parses `faq.md` (official-style FAQ HTML) into `data/faq.json` via `scripts/extract_faq.py`.
-- Answers questions with **BM25** (`rank-bm25`) over question+answer text—fast and explainable on modest hardware.
-- When nothing in the query overlaps the corpus (score 0), it **refuses to invent** an answer and suggests keywords.
-- When a match is weak, it **surfaces uncertainty** and reminds users to verify on the live admissions site.
+## What you get
 
-## Run
+You type a question in plain English. The app finds the closest entries in a bundled FAQ (sourced from the official NUST FAQ snapshot in `faq.md`, extracted to `data/faq.json`). Answers come straight from that text, not from a model making things up.
+
+A few behaviours that matter:
+
+- **No match, no guess.** If your words don’t overlap the FAQ enough, you get a nudge to try different keywords instead of a random paragraph.
+- **Weak match?** It’ll say so and still remind you to double-check on the live admissions site.
+- **CPU-only, low drama.** No GPU, no giant transformer download—just retrieval that’s quick on a typical laptop.
+
+## Quick start
 
 ```bash
 pip install -r requirements.txt
-python scripts/extract_faq.py   # regenerate JSON if faq.md changes
+python scripts/extract_faq.py   # rebuild data/faq.json if you change faq.md
 python app.py
 ```
 
-Open `http://127.0.0.1:5000`.
+Then open **http://127.0.0.1:5000** in your browser.
 
-## Tradeoffs (for judges)
+First-time setup needs network for `pip`; after that, the app itself doesn’t need a connection to work.
 
-| Choice | Why |
-|--------|-----|
-| BM25, not a local LLM | Sub‑millisecond typical latency, tiny RAM footprint, answers are verbatim from the FAQ (trustworthy). |
-| No GPU / no transformers | Stays within 8GB RAM and i5-class CPU; predictable behaviour under load. |
-| HTML answers preserved | Rich text from the source FAQ; retrieval stays grounded. |
-| Confidence + “no match” path | Avoids confident wrong answers when the query shares no tokens with the corpus. |
+## Repo layout (the useful bits)
 
-Run `python scripts/benchmark.py` for a rough latency distribution on your machine.
+| Path | Role |
+|------|------|
+| `app.py` | Flask server and `/api/chat` |
+| `templates/`, `static/` | Chat UI |
+| `nust_chatbot/retrieve.py` | BM25 over FAQ entries |
+| `faq.md` | Raw FAQ HTML |
+| `data/faq.json` | Parsed Q&A (generated—don’t hand-edit unless you know what you’re doing) |
+| `scripts/extract_faq.py` | HTML → JSON |
+| `scripts/benchmark.py` | Quick latency sanity check |
 
-## Limits
+## Why BM25 and not a local LLM?
 
-- Content is only as current as `faq.md`. Dates and policies must be confirmed on **official** NUST channels.
-- Retrieval is lexical; rephrase if a synonym-heavy question misses.
+Tradeoffs are simple: BM25 is fast, tiny in memory, and the answers stay **verbatim** from your FAQ—which is easier to defend in a demo. A local LLM could paraphrase and drift; here, what you see is what’s in the file.
+
+Run `python scripts/benchmark.py` if you want a rough latency read on your hardware.
+
+## Caveats (read this once)
+
+Policies and dates change. Treat this as a **mirror of whatever is in `faq.md`**, not a legal substitute for the official NUST admissions pages. If something sounds time-sensitive, verify it there.
+
+Search is **lexical**—if you ask in a way that doesn’t share words with the FAQ, try rephrasing or using terms like NET, programme names, fees, etc.
+
+## License / use
+
+Built for a NUST competition-style submission; adapt the code and copy as you need for your own project.
